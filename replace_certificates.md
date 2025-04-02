@@ -66,6 +66,8 @@ Background info here:<br>
      -----BEGIN RSA PRIVATE KEY-----
      <private key file goes here, rsa format>
      -----END RSA PRIVATE KEY-----
+     
+   setting.harvesterhci.io/additional-ca edited
 
    # export JSONCERTS=$(yq -ojson /usr/local/etc/certs.txt) ; kubectl get setting ssl-certificates -o yaml | yq ".value = strenv(JSONCERTS)" | kubectl apply -f -
    setting.harvesterhci.io/ssl-certificates configured
@@ -77,6 +79,8 @@ Background info here:<br>
 
 1. Utilize either the GUI or the commandline to update the Certificate Authority (CA) setting section of Harvester, to include the new Certificate's Authority chain (Root CA and all Intermediate CA's, if applicable).  Rancher calls this the 'cacerts' setting.  It is recommended that the current setting be _appended_ to, rather than replaced:
    ```
+   # kubectl --context=vcluster edit setting cacerts
+
    # Please edit the object below. Lines beginning with a '#' will be ignored,
    # and an empty file will abort the edit. If an error occurs while saving this file will be
    # reopened with the relevant failures.
@@ -109,6 +113,8 @@ Background info here:<br>
      -----BEGIN CERTIFICATE-----
      <your new pem-encoded certificate #2>
      -----END CERTIFICATE-----
+
+   setting.management.cattle.io/cacerts edited
      ```
      On the GUI, you can find the "Global Settings" (Globe Icon) section at the bottom of the menu on the left of the Rancher main page, after login.
 
@@ -136,9 +142,9 @@ This example will be for the hauler-fileserver Ingress above (the fileserver-tls
 
 1. Convert the PEM-encoded Certificate and CA, and the RSA-encoded Key to Base64, and save them as environment variables:
    ```
-   BASE64CA=$(cat fileserver-ca.cert | base64 -w0)
-   BASE64CERT=$(cat fileserver.cert | base64 -w0)
-   BASE64KEY=$(cat fileserver.key | base64 -w0)
+   export BASE64CA=$(cat fileserver-ca.cert | base64 -w0)
+   export BASE64CERT=$(cat fileserver.cert | base64 -w0)
+   export BASE64KEY=$(cat fileserver.key | base64 -w0)
    ```
    
 1. Apply these new values to the three applicable fields of the Secret.  Pay close attention to the namespace, secret name, and .data values in this command:
